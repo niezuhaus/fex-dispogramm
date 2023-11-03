@@ -1,0 +1,50 @@
+@import "../../../../const";
+p {
+  display: flex;
+  flex-direction: row;
+}
+
+.note {
+  color: $fex-dark;
+}
+
+.pickup {
+  color: $pickup-tone;
+}
+
+.delivery {
+  color: $delivery-tone;
+}
+
+span:not(.hightlight) {
+    display: flex;
+    align-items: center;
+    //margin-left: 5px;
+}
+
+.hightlight-gray {
+  border-color: $gray !important;
+  color: $gray !important;
+}
+
+.gray {
+  color: $gray !important;
+}
+
+.notice {
+  padding: 1px 4px;
+  font-size: 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  margin-left: 10px;
+}
+
+.hint {
+  border: 2px solid $gray;
+  color: $gray;
+}
+
+.alarm {
+  border: 2px solid $warn;
+  color: $warn;
+}

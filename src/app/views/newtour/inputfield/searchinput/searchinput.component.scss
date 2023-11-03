@@ -1,0 +1,43 @@
+@import "src/const.scss";
+
+.mat-form-field-wrapper {
+  padding-bottom: 17px;
+}
+
+.mat-option {
+  max-width: 400px;
+  min-width: 250px;
+}
+
+.mat-form-field {
+  padding-right: 20px;
+}
+
+.job-option {
+  border-left: 3px solid $billing !important;
+  min-height: 48px;
+  height: unset;
+  padding: 8px 5px;
+}
+
+.client-option {
+  border-left: 3px solid $client-option !important;
+}
+
+.location-option {
+  border-left: 3px solid $location-option !important;
+}
+
+.client-client-option {
+  border-left: 3px solid $client-client-option !important;
+  height: fit-content;
+  padding: 6px 15px;
+}
+
+.messenger-option {
+  border-left: 3px solid $messenger-option !important;
+}
+
+.zone-option {
+  border-left: 3px solid $lex !important;
+}

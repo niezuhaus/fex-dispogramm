@@ -1,0 +1,114 @@
+@import "src/const.scss";
+
+* {
+  display: flex;
+}
+
+#leftSide {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  z-index: 1;
+  background: white;
+}
+
+#mapcontainer {
+  position: absolute;
+  height: calc(100vh - 56px);
+  width: calc(100vw - 300px);
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+}
+
+app-inputfield {
+  width: 100%;
+}
+
+#extra mat-option {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.flashButton {
+  background-color: $fex-dark;
+  margin-right: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+#trash:hover, #reset:hover {
+  color: white !important;
+}
+
+#summary {
+  bottom: 0;
+  right: 0;
+  min-width: 250px;
+  background: white;
+  border-radius: 4px;
+}
+
+.branch {
+  padding-left: 15px;
+}
+
+.dBranch {
+  color: $delivery-tone;
+  cursor: pointer;
+}
+
+.pBranch {
+  color: $pickup-tone;
+  cursor: pointer;
+}
+
+#distprice {
+  background-color: white;
+  color: black;
+  font-family: monospace;
+}
+
+#distance, #price {
+  font-size: 16px;
+}
+
+#description {
+  animation-duration: 0.2s;
+  align-items: flex-start !important;
+}
+
+#summary > div > div {
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: row;
+  padding: 10px 0;
+}
+
+#extraBorder {
+  color: lightgray;
+  margin: 8px 0 5px 0;
+  border-top: dashed 2pt;
+}
+
+.price {
+  margin: 0 5px 0 5px !important;
+  padding: 5px !important;
+  text-align: right !important;
+  width: 60px !important;
+}
+
+.extra {
+  width: 180px !important;
+}
+
+.priceActive {
+  border: 2px solid $billing;
+}
+
+.gray {
+  color: $gray !important;
+}

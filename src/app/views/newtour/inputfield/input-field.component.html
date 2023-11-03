@@ -1,0 +1,53 @@
+<div class="flex flex-column">
+  <div class="flex flex-row align-items-baseline justify-content-between w-100">
+    <div style="width: 20px" class="mr-2 flex">
+      <i *ngIf="(!hasBacktour && (!(searchinput.selection) || searchinput.selection.id?.length > 0))" class="bi bi-circle-fill"
+         [style.opacity]="searchinput.searchTerm.length > 0 ? 1 : .2"
+         style="animation-duration: .2s" [style.color]="circleColor"></i>
+      <a *ngIf="!hasBacktour && searchinput.selection && searchinput.selection?.id?.length === 0"
+         matTooltip="ort speichern"
+         (click)="openLocationDialog.emit({loc: searchinput.selection, input: this})">
+        <i class="bi bi-plus-circle-fill"
+           [style.opacity]="searchinput.searchTerm.length > 0 ? 1 : .2"
+           style="animation-duration: .2s" [style.color]="circleColor"></i>
+      </a>
+      <img src="../../../../assets/marker/backtour.png" *ngIf="hasBacktour" alt="rücktour" style="margin-bottom: 6px">
+    </div>
+    <searchinput
+      style="width: 220px !important;"
+      autofocus
+      [label]="type === 1 ? 'abholung' : 'abgabe'"
+      [searchOSM]="true"
+      [searchClientLocations]="true"
+      [searchLocations]="true"
+      [type]="type"
+      [index]="index"
+      [placeholder]="'kund:innenenname, adresse...'"
+      [inputField]="this"
+      (locationSelected)="selectedParent($event)"
+      (clientSelected)="clientSelectedParent($event)"
+      (resetted)="this.resetted.emit(true);"
+      (register)="this.register.emit(this.searchinput);"
+      (startedTyping)="startedTyping.emit(true)"
+      [disabled]="disabled"
+      #searchinput>
+    </searchinput>
+
+    <a mat-icon-button
+       class="ml-1"
+       #hasback
+       (click)="hasback.disabled ? doNothing() : backtourToggle()"
+       [disabled]="!(this.searchinput.selection) || disabled"
+       [tabIndex]="-1"
+       matTooltip="rücktour hinzufügen">
+      <i class="bi bi-arrow-left-right" [class.fex-accent]="hasBacktour" style="color: black"></i>
+    </a>
+  </div>
+  <a
+    *ngIf="searchinput.selection?.id?.length === 0"
+    class="mb-2 ml-5"
+    (click)="openLocationDialog.emit({loc: searchinput.selection, input: this})">
+    ort hinzufügen
+  </a>
+</div>
+

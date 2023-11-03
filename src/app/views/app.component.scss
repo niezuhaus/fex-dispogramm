@@ -1,0 +1,92 @@
+@import "../../const";
+
+#header {
+  position: absolute;
+  margin-top: 20px;
+  left: 0;
+  width: 100vw;
+  color: white;
+  background-color: $fex-light;
+  z-index: 2;
+}
+
+#header h1 {
+  color: white;
+  font-size: 30px;
+  text-align: right;
+  margin: 0;
+}
+
+#buttons > * {
+  margin-left: 20px;
+}
+
+#drawer {
+  width: 180px;
+  box-shadow: inset -4px 0px 14px 0px #c4c4c4
+}
+
+app-loading {
+  z-index: 10;
+}
+
+#drawer button {
+  margin: 6px;
+  width: 100% !important;
+}
+
+.side-nav-button {
+  display: flex !important;
+
+}
+
+#content {
+  overflow-x: hidden;
+  height: calc(100vh - 56px);
+  top: 56px;
+  position: relative;
+}
+
+app-inputfield {
+  width: 100%;
+}
+
+.mat-ripple, button {
+  //min-width: 100px;
+}
+
+.mat-ripple > a, button {
+  color: white;
+}
+
+.mat-ripple > a:hover {
+  color: #ff8f8f;
+  text-decoration: none;
+}
+
+/* input color class */
+::ng-deep input.mat-input-element {
+  color: #484a4c;
+}
+
+/* Change label color on focused */
+::ng-deep .mat-form-field.mat-focused .mat-form-field-label {
+  color: black !important;
+}
+
+/* underline border color on focused */
+::ng-deep .mat-focused .mat-form-field-underline .mat-form-field-ripple {
+  background-color: $fex-dark !important;
+}
+
+.truncate {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#searchbar {
+  backdrop-filter: blur(4px);
+}
+

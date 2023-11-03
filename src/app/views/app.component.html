@@ -1,0 +1,89 @@
+<div class="m-0">
+  <div #searchbar (click)="search = false" *ngIf="search" style="background: #aaa4" id="searchbar"
+       class="z-10 absolute w-100 h-100 -bottom-0 -left-0 flex align-items-center justify-content-around">
+    <div class="bg-white px-5 py-3">
+      <h3>suche nach kund:innen, kurier:innen, standorten, kontakten, festtouren...</h3>
+      <searchinput
+        #input
+        [width]="'100%'"
+        (keydown)="onKeyDown($event)"
+        [searchClients]="true"
+        [searchMessenger]="true"
+        [searchLocations]="true"
+        [searchZones]="true"
+        (locationSelected)="$event.openDialog(); search = false"
+        (clientClientSelected)="$event.openPage(); search = false;"
+        (messengerSelected)="$event.openDialog(); search = false;"
+        (zoneSelected)="zoneSelected($event); search = false"
+      >
+      </searchinput>
+    </div>
+  </div>
+
+  <div id="header" class="flex flex-row justify-content-between">
+    <div id="buttons" class="flex align-items-center">
+      <button mat-raised-button class="fex-button" (click)="drawer.toggle()">
+        <i class="bi bi-list"></i>
+      </button>
+      <!--      <button *ngIf="backendIP" mat-raised-button class="fex-button" [routerLink]="routes().statistics">-->
+      <!--        <i class="bi bi-bar-chart"></i>-->
+      <!--      </button>-->
+      <button *ngIf="backendIP()" matTooltip="benutzer:in ändern" mat-raised-button class="fex-button" [class.fex-button-warn]="!dispatcher()"
+              style="min-width: unset" (click)="openChangeUserDialog()">
+        <i class="bi bi-person"></i>
+        {{dispatcher()?.messenger.nickname || 'einchecken'}}
+      </button>
+      <button *ngIf="backendIP()" mat-raised-button class="fex-button"
+              [routerLink]="[routes().tourplan, {date: dateString()}]">
+        tourenzettel
+      </button>
+      <button *ngIf="backendIP()" mat-raised-button class="fex-button" [routerLink]="routes().weekplan">
+        wochenplan
+      </button>
+      <button *ngIf="backendIP()" mat-raised-button class="fex-button" [routerLink]="routes().newTour">
+        <div class="flex flex-row align-items-center">
+          <i class="mr-1 bi bi-plus-circle"></i>
+          <span>tour</span>
+        </div>
+      </button>
+      <button *ngIf="backendIP()" mat-raised-button class="fex-button" (click)="openDateDialog()">
+        <div class="flex flex-row align-items-center">
+          <i class="mr-1 bi bi-plus-circle"></i>
+          <span>anmeldung</span>
+        </div>
+      </button>
+    </div>
+    <h1 *ngIf="backendIP()" class="mx-4 truncate">{{componentRef?.title}}</h1>
+  </div>
+
+  <mat-drawer-container id="content" class="example-container" autosize>
+    <mat-drawer id="drawer" #drawer class="example-sidenav p-4" mode="side">
+      <div class="flex align-items-center flex-col">
+        <button *ngIf="backendIP()" mat-raised-button class="fex-button side-nav-button" (click)="drawer.close()" [routerLink]="routes().clientlist">
+          <i class="bi bi-person-lines-fill mr-2"></i> kund:innen
+        </button>
+        <button *ngIf="backendIP()" mat-raised-button class="fex-button side-nav-button" (click)="drawer.close()" [routerLink]="routes().locations">
+          <i class="bi bi-geo mr-2"></i> standorte
+        </button>
+        <button *ngIf="backendIP()" mat-raised-button class="fex-button side-nav-button" (click)="drawer.close()" [routerLink]="routes().messengers">
+          <i class="bi bi-bicycle mr-2"></i> kurier:innen
+        </button>
+        <button mat-raised-button class="fex-button align-items-center" style="display: flex" (click)="openConfigDialog(); drawer.close()">
+          <i class="bi bi-gear-wide-connected mr-2"></i> einstellungen
+        </button>
+      </div>
+    </mat-drawer>
+    <app-loading *ngIf="!loaded"></app-loading>
+    <div [class.hidden]="!loaded">
+      <router-outlet
+        class="pt-lg-2"
+        (activate)="onActivate($event)"
+        (loadstart)="outlet.style.opacity = '0'"
+        (load)="outlet.style.opacity = '100'"
+        style="animation-duration: 0.2s"
+        #outlet></router-outlet>
+    </div>
+  </mat-drawer-container>
+
+</div>
+

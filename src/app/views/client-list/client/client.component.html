@@ -1,0 +1,301 @@
+<div *ngIf="loading" style="height: 90vh !important;"
+     class="flex w-100 h-100 align-items-center justify-content-center">
+  <bike style="margin: auto"></bike>
+</div>
+<div id="information" *ngIf="!loading">
+  <div class="flex flex-row justify-between">
+    <h3>{{client.name}}</h3>
+    <div *ngIf="config.lexofficeActivated" class="flex flex-row">
+      <button [disabled]="!lexContact" mat-raised-button class="mr-4 lex-button" (click)="lexInvoice()">
+        neue rechnung
+      </button>
+      <button [disabled]="!lexContact" mat-raised-button class="mr-4 lex-button" (click)="getInvoices(lexContact)">
+        rechnungen...
+      </button>
+      <button
+        mat-raised-button
+        class="mr-4 flex lex-button align-items-center"
+        [disabled]="!!(lexContact)"
+        (click)="createMe()">
+        in lexoffice anlegen
+        <img src="/assets/lex_white.png" style="height: 17px; display: inline;" alt="lexoffice">
+      </button>
+      <a [href]="'https://app.lexoffice.de/contacts/' + lexContact?.id" target="_blank">
+        <button
+          mat-raised-button
+          class="mr-4 flex lex-button align-items-center"
+          [disabled]="!lexContact">
+          kund:in in lexoffice<i class="ml-3 bi bi-box-arrow-right"></i>
+        </button>
+      </a>
+    </div>
+  </div>
+  <div class="flex flex-row justify-content-between" *ngIf="!loading">
+
+    <mat-accordion style="min-width: 400px; max-width: 500px" class="mt-3" multiple>
+      <mat-expansion-panel expanded>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            stammdaten
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="flex flex-column">
+          <mat-form-field>
+            <mat-label>#kund:in</mat-label>
+            <input
+              type="text"
+              matInput
+              [placeholder]="clientBackup.clientId?.toString()"
+              [(ngModel)]="client.clientId">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>name</mat-label>
+            <input
+              type="text"
+              matInput
+              [placeholder]="clientBackup.name"
+              [(ngModel)]="client.name">
+          </mat-form-field>
+          <div class="flex flex-row justify-content-between align-items-center">
+            <searchinput
+              [label]="'straße'"
+              [searchOSM]="true"
+              [placeholder]="clientBackup.street"
+              (locationSelected)="streetSelected($event)"
+              class="pr-3 pl-0 w-100"
+              ngDefaultControl
+              [content]="clientBackup.street"
+              [(str)]="client.street"
+              style="margin-right: 15px">
+            </searchinput>
+            <mat-form-field class="w-20" style="min-width: 80px">
+              <mat-label>postleitzahl</mat-label>
+              <input
+                type="text"
+                matInput
+                [placeholder]="clientBackup.zipCode"
+                [(ngModel)]="client.zipCode">
+            </mat-form-field>
+          </div>
+          <mat-form-field>
+            <mat-label>stadt</mat-label>
+            <input
+              type="text"
+              matInput
+              [placeholder]="clientBackup.city"
+              [(ngModel)]="client.city">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>weitere infos</mat-label>
+            <textarea matInput [(ngModel)]="client.info"></textarea>
+          </mat-form-field>
+
+          <div class="flex justify-content-center" style="width: 100%">
+            <mat-button-toggle-group [(ngModel)]="client.billClient" style="margin-bottom: 10px" class="flex flex-row">
+              <mat-button-toggle [value]="true">rechnungskund:in</mat-button-toggle>
+              <mat-button-toggle [value]="false">barkund:in</mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+          <button mat-raised-button class="fex-button" style="width: 100% !important"
+                  (click)="saveClient()">
+            kund:innendaten speichern
+          </button>
+        </div>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          {{'standorte (' + locations.length + ')'}}
+        </mat-expansion-panel-header>
+        <div class="flex flex-row flex-wrap">
+          <app-container
+            *ngFor="let loc of locations"
+            [type]="'location'"
+            [location]="loc"
+            (updated)="getLocations()"
+            (deleted)="getLocations()"
+            class="mr-4 mb-4">
+          </app-container>
+          <app-container
+            [type]="'location'"
+            [client]="client"
+            (created)="locations.push($event)">
+          </app-container>
+        </div>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          {{'kontakte (' + contacts.length + ')'}}
+        </mat-expansion-panel-header>
+
+        <div class="flex flex-row flex-wrap">
+          <app-container
+            *ngFor="let con of contacts"
+            [type]="'contact'"
+            [contact]="con"
+            (updated)="getContacts()"
+            (deleted)="getContacts()"
+            class="mr-4 mb-4">
+          </app-container>
+          <app-container
+            [type]="'contact'"
+            [client]="client">
+          </app-container>
+        </div>
+
+      </mat-expansion-panel>
+    </mat-accordion>
+
+    <!--  gefahrene touren-->
+    <div class="ml-5 w-100" style="margin-right: 20px">
+      <div class="flex flex-row align-items-center justify-content-between">
+        <div class="flex flex-row align-items-center">
+          <h4>gefahrene touren im</h4>
+          <datepicker [date]="date" [monthly]="true" (dateChange)="query($event)" class="mx-2"></datepicker>
+        </div>
+        <mat-form-field class="mt-2 ml-2 px-2" style="width: 200px">
+          <mat-label>auftrag suchen</mat-label>
+          <input matInput (keyup)="applyFilter($event)" #input>
+        </mat-form-field>
+      </div>
+      <!--      <div class="flex flex-row justify-content-between" style="align-items: baseline">-->
+      <!--        <button mat-raised-button class="mx-2 fex-button" (click)="createInvoiceWrapper()"-->
+      <!--                matTooltip="rechnung speichern">-->
+      <!--          rechnung speichern <i class="ml-2 bi bi-download"></i>-->
+      <!--        </button>-->
+      <!--      </div>-->
+      <div class="flex flex-column justify-content-between" style="height: calc(100vh - 350px)">
+        <div style="overflow-y: scroll; overflow-x: hidden; padding-bottom: 75px">
+          <table
+            *ngIf="!loadingTours && jobs.length > 0"
+            mat-table
+            #table
+            [dataSource]="dataSource"
+            matSort
+            matSortActive="date"
+            matSortDirection="asc"
+            class="h-100"
+            style="overflow-y: scroll">
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 155px; text-align: right"> zeit</th>
+              <td mat-cell *matCellDef="let element">
+                <div class="flex p-2 flex-column justify-content-around align-items-center">
+                  <a style="white-space: nowrap; justify-self: end"
+                     [routerLink]="[routes.tourplan, {date: element.date.yyyymmdd()}]"
+                     [matTooltip]="
+                     (element.creator ? 'angelegt von ' + element.creator?.nickname : '')
+                      + (element.dispatcher ? ', disponiert von ' + element.dispatcher?.nickname : '')
+                     + (element.messenger ? ', gefahren von ' + element.messenger?.nickname : '')">
+                    {{element.date.dateStampShort()}} {{element.date.timestamp()}}
+                  </a>
+                  <!--                  <div class="flex flex-column align-items-baseline">-->
+                  <!--                    <div *ngIf="element.creator" class="flex align-items-center"><i class="mr-1 bi bi-telephone-inbound" style="font-size: 14px"></i> {{element.creator?.nickname}}-->
+                  <!--                    </div>-->
+                  <!--                    <div *ngIf="element.dispatcher" class="relative bottom-2 flex align-items-center">-->
+                  <!--                      <i class="mr-1 bi bi-check" style="font-size: 24px"></i> {{element.dispatcher?.nickname}}</div>-->
+                  <!--                    <div *ngIf="element.messenger" class="relative bottom-5 flex align-items-center">-->
+                  <!--                      <i class="mr-1 bi bi-bicycle" style="font-size: 18px"></i>{{element.messenger?.nickname}}</div>-->
+                  <!--                  </div>-->
+                </div>
+            </ng-container>
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef><span class="ml-5">beschreibung</span></th>
+              <td mat-cell *matCellDef="let element" class="toBottom">
+                <a class="flex-column">
+                  <description
+                    [job]="element" [moreLocations]="locations && locations.length > 1"
+                    [clientView]="true"
+                    [hideHighlights]="true" [hideTimeAlarms]="true"></description>
+                </a>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="traveldist">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-center" style="width: 100px"><span
+                class="ml-4">streckenlänge</span></th>
+              <td mat-cell *matCellDef="let element" class="text-center"> {{element.traveldist}} km</td>
+            </ng-container>
+            <ng-container matColumnDef="price">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-center" style="width: 120px">preis</th>
+              <td mat-cell *matCellDef="let element" class="text-center">
+                <span>{{element.priceString()}}</span>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (contextmenu)="onRightClick($event, row)"></tr>
+          </table>
+          <h5 *ngIf="!loadingTours && jobs.length === 0"
+              class="flex pt-5 h-100 align-items-center justify-content-center">
+            <i>- keine touren vorhanden -</i>
+          </h5>
+          <div id="bike" *ngIf="loadingTours">
+            <bike style="margin: auto"></bike>
+          </div>
+        </div>
+
+        <div class="container">
+          <div style="visibility: hidden; position: fixed"
+               [style.left.px]="menuTopLeftPosition.x"
+               [style.top.px]="menuTopLeftPosition.y"
+               [matMenuTriggerFor]="rightMenu"></div>
+
+          <mat-menu #rightMenu="matMenu">
+            <ng-template matMenuContent let-item="item">
+              <right-click-menu
+                [job]="item">
+              </right-click-menu>
+            </ng-template>
+          </mat-menu>
+        </div>
+      </div>
+      <div cdkDrag *ngIf="!loadingTours" class="drag notes fex-dark"
+           style="right: 20px; bottom: 20px; color: white; min-width: unset">
+        <div class="flex shadow flex-column justify-content-between p-3.5">
+          <h4>rechnungsbetrag</h4>
+          <div style="font-family: monospace; width: fit-content"
+               class="flex flex-column">
+            <div class="flex flex-row justify-content-between">
+              <span>ad-hoc aufträge</span>
+              <span class="ml-4">{{sum}} €</span>
+            </div>
+            <div *ngFor="let rj of regularJobs" class="flex flex-row">
+              <div class="flex w-100 justify-content-between"
+                   *ngIf="!rj.endDate || date.monthStart().isBefore(rj.endDate)">
+                <span>
+                <a class="fex-accent" [routerLink]="[routes.newTour, {id: rj.id, rj: true}]">
+                  <i>{{rj.name}}</i>
+                </a>
+                <span *ngIf="rj.endDate && rj.endDate.isInMonth(date)" class="ml-3">(bis {{rj.endDate.dateStampShort()}}
+                  )</span>
+                </span>
+                <span class="ml-4">{{rj.monthlyPrice._netto}} €</span>
+              </div>
+            </div>
+
+            <div class="flex pt-4 justify-content-between" style="border-top: 2px solid white">
+              <span><b>zwischensumme</b></span>
+              <span class="ml-4"><b>{{totalSum._netto}} €</b></span>
+            </div>
+            <div class="flex justify-content-between">
+              <span>mehrwertsteuer</span>
+              <span class="ml-4">{{totalSum.mwst()}} €</span>
+            </div>
+
+            <div class="flex pt-4 justify-content-between" style="border-top: 2px solid white">
+              <span><b>summe</b></span>
+              <span class="ml-4"><b>{{totalSum.bruttoOnCent()}} €</b></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--  löschen button -->
+    <button mat-raised-button class="fex-button" id="delete"
+            *ngIf="jobs?.length === 0 || isDezwo"
+            (click)="deleteClient()">
+      kund:in löschen
+    </button>
+
+  </div>
+</div>

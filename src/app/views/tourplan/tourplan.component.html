@@ -1,0 +1,403 @@
+<div class="h-100">
+  <!--header-->
+  <div class="flex w-100 flex-column justify-content-between" style="background-color: white; z-index: 1;">
+    <div class="flex justify-content-between align-items-center">
+      <!--    first line-->
+      <div class="flex flex-row">
+        <button matTooltip="aktualisieren" (click)="refresh()" mat-raised-button class="m-4 fex-button">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+
+        <datepicker
+          [(date)]="date"
+          (dateChange)="dateChanged($event)"
+          [headline]="true"
+          #datepicker>
+        </datepicker>
+      </div>
+      <div class="flex flex-row align-items-baseline">
+        <searchinput
+          #fastJobInput
+          *ngIf="globallyLoaded"
+          [label]="'schnelleingabe'"
+          [icon]="'bi-lightning-charge'"
+          [disabled]="!dispatcherCheckedIn"
+          [searchClientLocations]="true"
+          [searchJobs]="true"
+          [placeholder]="'kund:innenname...'"
+          (jobSelected)="createNewJob($event)"
+          style="width: 250px;"
+          class="ml-4">
+        </searchinput>
+
+        <mat-form-field class="mx-4" style="max-width: 250px">
+          <mat-label><i class="mr-1 bi bi-search"></i>suchen...</mat-label>
+          <input #search matInput (keyup)="applyFilter($event)" (click)="search.select()">
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="ml-5" *ngIf="items.length > 0">
+      <mat-chip-list selectable multiple>
+        <mat-chip
+          #f="matChip"
+          *ngFor="let filter of filterStrategies; let i = index"
+          color="primary"
+          [selected]="filter.selected"
+          (click)="filter.selected = !filter.selected; filterJobsByKeyword(); filterStatus[i] = filter.selected; saveFilterStatus();">
+          <i *ngIf="filter.selected" class="mr-2 bi bi-check"></i>
+          <div [innerHTML]="filter.name(filter.selected)"></div>
+        </mat-chip>
+      </mat-chip-list>
+    </div>
+  </div>
+
+  <!--<div *ngIf="shiftsWithoutEnd().length > 0" class="px-3" style="width: 100%">-->
+  <!--  <p class="flex fex-light">hinweis: für {{shiftsWithoutEnd().length}} schichten fehlen noch die endzeiten.-->
+  <!--    <a class="flex fex-accent align-items-center"><i class="bi bi-arrow-right-short"></i>jetzt eintragen</a>-->
+  <!--  </p>-->
+  <!--</div>-->
+
+  <div *ngIf="!loaded" style="height: 90vh !important;"
+       class="flex w-100 h-100 align-items-center justify-content-center">
+    <bike style="margin: auto"></bike>
+  </div>
+
+  <div *ngIf="loaded" [style.visibility]="(loaded) ? 'unset' : 'hidden'" class="h-100">
+    <div *ngIf="loaded && (!items || !(items.length > 0))"
+         class="flex w-100 h-50 justify-content-around position-relative"
+         style="top: 60px">
+      <div class="flex flex-column justify-content-center"
+           style="text-align: center">
+        <h2>
+          <i style="color: gray">
+            - keine touren bisher -
+          </i>
+        </h2>
+      </div>
+      <!--    <div *ngIf=""></div>-->
+    </div>
+
+    <section id="tourplan" class="flex flex-column justify-content-between" *ngIf="items.length > 0">
+      <table
+        #table
+        id="jobs"
+        mat-table
+        matSort
+        matSortActive="date"
+        matSortDirection="desc"
+        [style.visibility]="(loaded && items && items.length > 0) ? 'unset' : 'hidden'"
+        style="width: 100%"
+        [dataSource]="dataSource">
+        <ng-container matColumnDef="number">
+          <th mat-header-cell *matHeaderCellDef class="text-center">#</th>
+          <td mat-cell *matCellDef="let element; let i = index" style="width: 100px">
+            <div *ngIf="!element.edit" class="flex flex-row w-100 justify-content-end">
+              <div *ngIf="element.finished" class="mr-5" matTooltip="beleg vorhanden">
+                <i class="bi bi-check-circle"></i>
+              </div>
+              <div class="mr-5 flex align-items-center">
+                {{element.index ? element.index : ''}}
+              </div>
+            </div>
+            <div *ngIf="element.edit">
+              <button mat-raised-button matTooltip="speichern" class="fex-button"
+                      (click)="element.save(); element.edit = false">
+                speichern
+              </button>
+            </div>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 100px; text-align: right">uhrzeit</th>
+          <td mat-cell *matCellDef="let element"
+              [matTooltip]="(element.isJob ? 'erstellt um ' + element._job.creationDate?.timestamp() + ', ' : '') + 'geplant für ' + element._date.timestamp()">
+            <div class="flex flex-column justify-content-around" *ngIf="!element.edit">
+              <div
+                *ngIf="isToday && !element._messenger && (element._date.getTime() < date.getTime() || element.isAlarm) && !element.isNote && !element._job?.canceled; else timestamp"
+                class="time-ago" [class.time-ago_alarm]="element.isAlarm">
+                {{element._date.timeAgo()}}
+              </div>
+              {{element.creator?.nickname}}
+              {{element.messenger?.nickname}}
+              <span *ngIf="element.messenger">gefahren von {{element.messenger?.nickname}}</span>
+              <ng-template #timestamp>
+              <span [class.text-white]="element.isNote">
+              {{element._date.timestamp()}}
+              </span>
+              </ng-template>
+              <div [class.text-white]="element.isNote" *ngIf="element._creator">{{element._creator?.nickname}}</div>
+            </div>
+            <timepicker [label]="'zeit'" *ngIf="element.edit" [(time)]="element._date"
+                        (keyup.enter)="element.update()"></timepicker>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>beschreibung</th>
+          <td mat-cell *matCellDef="let element" style="text-align: left">
+            <div class="flex flex-row justify-content-between align-items-center"
+                 [class.w-100]="element.note">
+              <description
+                *ngIf="!(element.note && element.edit)"
+                class="p-0 w-100 h-100"
+                [item]="element"
+                [headline]="true">
+              </description>
+              <div *ngIf="element.edit" class="mt-3 mr-3 ml-4 flex justify-content-between"
+                   [class.note]="!element.note" [class.w-100]="element.note">
+                <mat-form-field class="w-100" style="min-width: 200px;">
+                  <mat-label>notizen</mat-label>
+                  <textarea
+                    matInput
+                    cdkTextareaAutosize
+                    cdkAutosizeMinRows="3"
+                    [(ngModel)]="element._description"
+                    style="height: 100%">
+                </textarea>
+                </mat-form-field>
+              </div>
+              <div *ngIf="!element.edit && element._job?.description" class="flex note justify-content-between">
+              <span
+                style="margin: auto; height: 100%"
+                [class.gray]="element._job?.messenger"
+                [innerHTML]="element._job.description.toHTML()">
+              </span>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="max-width: 100px">preis</th>
+          <td mat-cell *matCellDef="let element" style="color: gray">
+            <div class="flex flex-column align-items-end">
+              <div *ngIf="!element.edit && element._price" class="price">
+            <span
+              [style.color]="element._billingTour ? 'black' : '#BBB'">{{element._job?.priceWithoutWaitingPrice._netto || element._price._netto}}</span>
+                /
+                <span
+                  [style.color]="!element._billingTour ? 'black' : '#BBB'">{{element._job?.priceWithoutWaitingPrice._brutto || element._price._brutto}}</span>
+              </div>
+              <span class="flex align-items-center" *ngIf="element._job?._waitingMinutes > 0">
+              <i
+                class="mr-2 bi bi-clock small"></i>{{element._job._waitingMinutes + 'min: ' + element._job?.waitingPrice?.netto}}
+            </span>
+              <span *ngIf="!element.edit && element.isJob && element.job?.expenses?.length > 0">
+            {{element.job.expenses.length + ' auslagen: ' + element.job.expenseSum}}
+            </span>
+              <div style="color: black; border-top: 1px solid gray; min-width: 80px"
+                   class="flex flex-column align-items-end"
+                   *ngIf="!element.edit && element.isJob && (element.job?._waitingMinutes > 0 || element.job?.expenses?.length > 0)">
+                {{(element._billingTour ? element._price._netto : element._price._brutto) + element.job?.expenseSum}}
+              </div>
+              <div *ngIf="element.edit && !element.note" class="flex flex-row align-items-center">
+                <mat-form-field>
+                  <mat-label>netto</mat-label>
+                  <input
+                    #netto
+                    matInput
+                    (keyup)="element._job.price.setByString(netto.value.valueOf(), false)"
+                    (keyup.enter)="element.update()"
+                    (click)="netto.select()"
+                    [value]="element._job.price?._netto.toString()">
+                </mat-form-field>
+                <span class="mx-2">/</span>
+                <mat-form-field>
+                  <mat-label>brutto</mat-label>
+                  <input
+                    #brutto
+                    matInput
+                    (keyup)="element._job.price.setByString(netto.value.valueOf(), true)"
+                    (keydown.enter)="element.update()"
+                    (click)="brutto.select()"
+                    [value]="element._job.price?._brutto.toString()">
+                </mat-form-field>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="messenger">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 200px" class="text-center">gefahren von
+          </th>
+          <td mat-cell *matCellDef="let element; let i = index" class="text-center">
+            <messenger-selector
+              *ngIf="!element.isNote && !element.job?.canceled"
+              (messengerSelect)="calcSales()"
+              [checkedIn]="checkedIn"
+              [earlyShift]="earlyShift"
+              [lateShift]="lateShift"
+              [item]="element">
+            </messenger-selector>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="traveldist">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 120px">länge</th>
+          <td mat-cell
+              *matCellDef="let element"> {{element.isJob || element.isRegularJob ? element._job.traveldist + ' km' : ''}}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class=""></tr>
+        <tr
+          mat-row *matRowDef="let row;
+        columns: displayedColumns;"
+          [ngClass]="{
+        'row_half-transparent' : row._job?.finished || row._job?.canceled,
+        'row_undispatched': isToday && !row._messenger && !row.isNote && !row._job?.canceled,
+        'row_note': row.isNote
+        }"
+          [style.border-left]="row._job?.finished ? ('') : ('20px solid ' + row._colour)"
+          (contextmenu)="onRightClick($event, row)"></tr>
+      </table>
+      <div style="padding-bottom: 300px"></div>
+    </section>
+  </div>
+
+  <!-- right click menu -->
+  <div class="container">
+    <div style="visibility: hidden; position: fixed"
+         [style.left.px]="menuTopLeftPosition.x"
+         [style.top.px]="menuTopLeftPosition.y"
+         [matMenuTriggerFor]="contextMenu"></div>
+
+    <mat-menu #contextMenu="matMenu">
+      <ng-template matMenuContent let-item="item" let-shift="shift">
+        <right-click-menu
+          [item]="item"
+          [shift]="shift"
+          (editJob)="editJob = $event">
+        </right-click-menu>
+      </ng-template>
+    </mat-menu>
+  </div>
+
+  <!-- add notes -->
+  <div class="position-fixed" style="bottom: 20px; left: 20px">
+    <div class="flex flex-row justify-content-between align-items-end">
+      <button *ngIf="!noteVisible" [disabled]="!dispatcherCheckedIn" mat-raised-button class="fex-button"
+              (click)="this.noteVisible = !this.noteVisible; area.focus()">
+        <div class="flex align-items-center">notiz hinzufügen<i class="ml-3 bi bi-plus-circle"></i></div>
+      </button>
+      <button *ngIf="noteVisible && area.value.trim().length" (click)="createNote()"
+              mat-raised-button class="fex-button">
+        <div class="flex align-items-center">speichern<i class="ml-3 bi bi-check"></i></div>
+      </button>
+      <button *ngIf="noteVisible && !area.value.trim().length" mat-raised-button class="fex-button"
+              (click)="this.noteVisible = !this.noteVisible">
+        <div class="flex align-items-center">abbrechen<i class="ml-3 bi bi-x-circle"></i></div>
+      </button>
+      <timepicker *ngIf="noteVisible" style="position: relative; top: 20px" class="flex" [label]="'uhrzeit'"
+                  [(time)]="note.date"></timepicker>
+    </div>
+    <div
+      [style.height]="noteVisible ? '150px' : '0'"
+      style="width: fit-content; min-width:300px; transition-duration: .25s; transition-timing-function: cubic-bezier(.77,0,.18,1); overflow-y: hidden">
+      <div class="shadow notes"
+           style="background: #EEE;">
+      <textarea
+        class="m-3"
+        #area
+        [(ngModel)]="note.text"
+        matInput
+        cdkTextareaAutosize
+        cdkAutosizeMinRows="2"
+        cdkAutosizeMaxRows="10"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loaded"
+       id="footer"
+       class="shadow drag"
+       style="background: #EEE; bottom: 20px; right: 20px"
+       cdkDrag>
+    <div class="flex-column">
+      <div class="flex flex-row justify-content-between align-items-center">
+        <h3 class="color-fex-dark">umsätze</h3>
+        <i *ngIf="!config.tourplan.salesMinimized" class="bi bi-chevron-down" [matTooltip]="'umsätze verstecken'"
+           (click)="saveConfigValue('salesMinimized', 'true'); config.tourplan.salesMinimized = true"></i>
+        <i *ngIf="config.tourplan.salesMinimized" class="bi bi-chevron-up" [matTooltip]="'umsätze anzeigen'"
+           (click)="saveConfigValue('salesMinimized', 'false'); config.tourplan.salesMinimized = false"></i>
+      </div>
+      <div *ngIf="!config.tourplan.salesMinimized" class="flex-column">
+        <h5 *ngIf="earlyShift.length || dispoEarly.length">
+          frühschicht
+          <span *ngIf="dispoEarly.length">
+          (dispo:
+          <a *ngIf="!dispoEarly[0].shift" class="fex-warn" matTooltip="es wurde keine schicht gefunden">
+            <i class="bi bi-person-add"></i>
+          </a>
+            <a (click)="dispoEarly[0].checkout(date)" *ngIf="dispoEarly[0].shift && !dispoEarly[0].shift?.end">
+             <i class="bi bi-person-dash"></i>
+           </a>
+           <a (click)="dispoEarly[0].checkout(date)" *ngIf="dispoEarly[0].shift?.end">
+             <i class="bi bi-check-lg"></i>
+           </a>
+            {{dispoEarly[0].nickname}}
+            )
+        </span>
+        </h5>
+        <div *ngFor="let messenger of earlyShift" class="grid-container">
+          <div class="mr-2" (contextmenu)="onRightClick($event, messenger.shift)">
+            <a *ngIf="!messenger.shift" class="fex-warn" matTooltip="es wurde keine schicht gefunden">
+              <i class="mr-2 bi bi-person-add"></i>{{messenger.nickname}}
+            </a>
+            <a (click)="messenger.checkout(date)" *ngIf="messenger.shift && !messenger.shift?.end">
+              <i class="mr-2 bi bi-person-dash"></i>{{messenger.nickname}}
+            </a>
+            <a (click)="messenger.checkout(date)" *ngIf="messenger.shift?.end">
+              <i class="mr-1 bi bi-check-lg"></i>{{messenger.nickname}}
+            </a>
+            <span *ngIf="messenger.shift">({{shiftLiterals[messenger.shift.type]}})</span>
+          </div>
+          <div style="min-width: 50px">
+            {{messenger.sales(date)?.nettoEarly || 0}}
+          </div>
+          <div style="min-width: 90px" [class.invisible]="!messenger.sales(date)?.grossEarly?._netto">
+            +{{messenger.sales(date)?.grossEarly || 0}} bar
+          </div>
+        </div>
+        <h5 *ngIf="lateShift.length || dispoLate.length">
+          spätschicht
+          <span *ngIf="dispoLate.length">
+          (dispo:
+          <a *ngIf="!dispoLate[0].shift" class="fex-warn" matTooltip="es wurde keine schicht gefunden">
+            <i class="bi bi-person-add"></i>
+          </a>
+            <a (click)="dispoLate[0].checkout(date)" *ngIf="dispoLate[0].shift && !dispoLate[0].shift?.end">
+             <i class="bi bi-person-dash"></i>
+           </a>
+           <a (click)="dispoLate[0].checkout(date)" *ngIf="dispoLate[0].shift?.end">
+             <i class="bi bi-check-lg"></i>
+           </a>
+            {{dispoLate[0].nickname}}
+            )
+        </span>
+        </h5>
+        <div *ngFor="let messenger of lateShift" class="grid-container">
+          <div class="mr-2" (contextmenu)="onRightClick($event, messenger.shift)">
+            <a *ngIf="!messenger.shift" class="fex-warn" matTooltip="es wurde keine schicht gefunden">
+              <i class="mr-2 bi bi-person-add"></i>{{messenger.nickname}}
+            </a>
+            <a (click)="messenger.checkout(date)" *ngIf="messenger.shift && !messenger.shift?.end">
+              <i class="mr-2 bi bi-person-dash"></i>{{messenger.nickname}}
+            </a>
+            <a (click)="messenger.checkout(date)" *ngIf="messenger.shift?.end">
+              <i class="mr-1 bi bi-check-lg"></i>{{messenger.nickname}}
+            </a>
+            <span *ngIf="messenger.shift">({{shiftLiterals[messenger.shift.type]}})</span>
+          </div>
+          <div style="min-width: 50px">
+            {{messenger.sales(date)?.nettoLate || 0}}
+          </div>
+          <div style="min-width: 90px" [class.invisible]="!messenger.sales(date)?.grossLate?._netto">
+            +{{messenger.sales(date)?.grossLate || 0}} bar
+          </div>
+        </div>
+        <hr>
+      </div>
+      <div class="fex-warn" *ngIf="!isToday && shiftsWithoutEnd.length">
+        für {{shiftsWithoutEnd.length}} schichten fehlt die endzeit
+      </div>
+      <div>
+        insgesamt {{sumNetto._netto}} + {{sumBrutto._brutto}} bar
+      </div>
+    </div>
+  </div>
+</div>

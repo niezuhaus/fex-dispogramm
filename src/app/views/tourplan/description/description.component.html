@@ -1,0 +1,160 @@
+<div class="flex flex-col w-100">
+  <div class="mb-1 flex flex-row align-items-center" [class.w-100]="item.isNote">
+
+    <!-- unirunde, käferrunde, etc... -->
+    <div *ngIf="!item.isRegularJob && item.morningTour > 0 && !hideHighlights"
+         class="mr-3 flex hightlight align-items-center"
+         [class.hightlight-gray]="gray">
+      <!--      {{morningTours()[item.morningTour - 1]}}-->
+      postrunde
+    </div>
+
+    <div *ngIf="job && !hideHighlights" class="flex flex-row">
+      <div *ngIf="pre && !item.isRegularJob" class="mr-3 flex align-items-center">
+      <span class="hightlight" [class.hightlight-gray]="gray">
+      vorangemeldet
+      </span>
+      </div>
+
+      <div *ngIf="job._falseArrival" class="mr-3 flex align-items-center">
+      <span class="hightlight" [class.hightlight-gray]="gray">
+      fehlanfahrt
+      </span>
+      </div>
+
+      <div *ngIf="(item.isRegularJob) && !hideHighlights"
+           class="mr-3 flex hightlight align-items-center"
+           [class.hightlight-gray]="gray">
+        festtour
+      </div>
+
+      <!-- cargotype -->
+      <div *ngIf="job.cargoType > 0" class="mr-3 flex align-items-center">
+        <img *ngIf="job.cargoType === 1" src="../../../../assets/cargo/last.png" alt="lastzuschlag"
+             [matTooltipDisabled]="hideToolTips" matTooltip="lastzuschlag" width="20px">
+        <img *ngIf="job.cargoType === 2" src="../../../../assets/cargo/lastenrad.png" alt="lastenrad"
+             [matTooltipDisabled]="hideToolTips" matTooltip="lastenrad" width="35px">
+        <img *ngIf="job.cargoType === 3" src="../../../../assets/cargo/carla.png" alt="e-lastenrad + anhänger"
+             [matTooltipDisabled]="hideToolTips" matTooltip="e-lastenrad + anhänger" width="45px">
+      </div>
+    </div>
+
+    <div class='flex flex-row w-100 h-100 justify-content-between align-items-center'>
+      <!-- note content -->
+      <h5 *ngIf="note" class="m-0 text-white">{{note.text}}</h5>
+
+      <!-- morning tour name -->
+      <a *ngIf="item.morningTour > 0"
+         [class.fex-light]="purpleRegularJobs && !gray"
+         [class.gray]="gray"
+         [class.fex-accent]="!purpleRegularJobs && !gray"
+         class="flex flex-row w-100"
+         (click)="item.openMorningTour()">
+        <span class="m-0" [style.font-size]="headline ? '1.25em' : '1em'">
+          {{morningTours[item.morningTour - 1]}}
+        </span>
+        <span class="ml-1" style="font-style: italic">
+          ({{item.morningJobs > 1 ? item.morningJobs : 'eine'}} kund:in{{item.morningJobs > 1 ? 'nen' : ''}})
+        </span>
+      </a>
+      <!-- job or regular job -->
+      <a id="joblink"
+         *ngIf="item.isAbstractJob && !(this.item.morningTour > 0)"
+         (click)="item.isRegularJob ? editQuestion() : goTo()"
+         [style.color]="(clientView ? '' : gray ? '#AAA' : '#5dc3c1') + ' !important'"
+         [class.line-trough-3px]="job._falseArrival"
+         class="dayplan-description w-100">
+        <div class="flex flex-row">
+          <span *ngIf="job && weekplan || headline || (moreLocations && job.regularJobId) || (clientView && item.job.name)"
+                id="headline"
+                [class.fex-accent]="!gray && !purpleRegularJobs"
+                [class.fex-light]="!gray && item.isRegularJob && purpleRegularJobs"
+                [class.line-through-3px]="job._canceled"
+                class="m-0 flex flex-row py-1"
+                style="width: fit-content"
+                [style.font-size]="headline ? '1.25em' : '1em'"
+                [matTooltipDisabled]="hideToolTips"
+                [matTooltip]="job.center?.address + (job.center?.description?.length > 0 ? ', ' + job.center?.description : '')"
+                matTooltipShowDelay="200">
+            {{item._name + (job?.clientInvolved ? '' : ' (nicht anfahren)') + (job?.specialPrice?.type === 2 ? ' (gruppenabgabe)' : '')}}</span>
+          <i *ngIf="job.client?.info && !moreLocations && !item.isRegularJob && !hideToolTips" class="ml-2 bi bi-info-circle"
+             style="font-size: small" [matTooltip]="job.client.info"></i>
+        </div>
+        <div *ngIf="!item.regularJob && !(job.name)">
+          <!--        gruppentarif-->
+          <p *ngIf="job.distributeNumber > 0"
+             style="margin: unset">{{job.distributeNumber === 1 ? 'eine abgabe' : job.distributeNumber + ' abgaben'}}</p>
+          <!--        abholungen-->
+          <div *ngIf="job.clientInvolved || (job.deliveries.length === 1 && !(job.pickups.length === 1))">
+            <p style="margin: unset" *ngFor="let station of job.pickups">
+          <span class="mr-2"
+                *ngIf="(!job.clientInvolved && center?.locType === 6) || moreLocations">
+            {{!job.clientInvolved ? job.deliveries[0]?.name : job.center.name}}
+          </span>
+              <span [matTooltipDisabled]="hideToolTips"
+                    [matTooltip]="station.address + (station.description?.length > 0 ? ', ' + station.description : '')"
+                    matTooltipShowDelay="200" [style.align-items]="weekplan ? 'start' : ''"
+                    [class.pickup]="!gray">
+              <i *ngIf="!station.hasBacktour"
+                 [classList]="(headline ? 'bi-arrow-left-circle' : 'bi-arrow-left-short') + ' bi toBottom mx-2'"></i>
+              <i *ngIf="station.hasBacktour" class="bi bi-arrow-left-right toBottom mx-2" [class.medium]="!clientView"
+                 [class.small]="clientView"></i>
+                {{station.name || station.address}}
+            </span>
+            </p>
+          </div>
+          <!--        abgaben-->
+          <div *ngIf="job.clientInvolved || job.pickups.length === 1">
+            <p style="margin: unset" *ngFor="let station of deliveries">
+          <span class="ml-2"
+                *ngIf="(!job.clientInvolved && center?.locType === 5) || moreLocations"
+                [class.pickup]="!gray">{{!job.clientInvolved ? job.pickups[0]?.name : job.center.name}}</span>
+              <span [matTooltipDisabled]="hideToolTips" [style.align-items]="weekplan ? 'start' : ''"
+                    [matTooltip]="station.address + (station.description?.length > 0 ? ', ' + station.description : '')"
+                    matTooltipShowDelay="200" [class.delivery]="!gray">
+              <i *ngIf="!station.hasBacktour"
+                 [classList]="(headline ? 'bi-arrow-right-circle' : 'bi-arrow-right-short') + ' bi toBottom mx-2'"></i>
+                <i *ngIf="station.hasBacktour" class="bi bi-arrow-left-right toBottom mx-2" [class.small]="!clientView"
+                   [class.small]="clientView"></i>
+                {{station.name || station.address}}
+          </span>
+            </p>
+          </div>
+          <div
+            [class.delivery]="!gray"
+            *ngIf="job.deliveries?.length > 0 && job.distributeNumber > job.deliveries.length">
+            und {{job.distributeNumber - job.deliveries.length}} weitere
+          </div>
+        </div>
+      </a>
+      <div class="notice alarm" *ngIf="clientView && !hideHints && item.timeUntil < 0 && !item._messenger" matTooltip="diese tour wurde nicht disponiert und wird nicht in die rechnung aufgenommen">nicht disponiert</div>
+      <div class="notice alarm" *ngIf="clientView && !hideHints && item.timeUntil < 0 && !item._job?.finished" matTooltip="diese tour wurde nicht abgeschlossen und wird nicht in die rechnung aufgenommen">nicht abgeschlossen</div>
+      <div class="notice hint" *ngIf="clientView && !hideHints && item.timeUntil > 0">tour liegt in der zukunft</div>
+      <div *ngIf="!hideTimeAlarms && item.isAlarm && !job?._canceled" class="mr-3 flex fex-warn align-items-center">
+        <i class="bi bi-exclamation-triangle" style="font-size: 30px"></i>
+      </div>
+      <div *ngIf="job?.finished" class="mx-3 flex align-items-center">
+        <i class="bi bi-check-circle" [style.color]="gray ? 'gray' : 'black'" style="font-size: 24px"></i>
+      </div>
+      <div class="optionDetail mx-3" *ngIf="showPrices">{{job.price.toString(job.billingTour)}}</div>
+    </div>
+  </div>
+
+  <div class="flex flex-row"
+       [class.gray]="gray">
+    <div *ngFor="let expense of item.job?.expenses?.reverse()"
+         (click)="expense.openEdit(item.job)"
+         class="mr-3 mb-2 flex cursor-pointer flex-row px-2 expense align-items-center"
+         [style.border-color]="gray ? 'unset' : '#5E3993'">
+      <i class="mx-2 bi bi-cash-coin" *ngIf="!item.edit"></i>
+      <a *ngIf="item.edit && !expense.delete" (click)="$event.stopPropagation(); expense.delete = true" class="mr-2">entfernen</a>
+      <span *ngIf="expense.delete"><a (click)="$event.stopPropagation(); job.deleteExpense(expense)" class="mr-2">ja</a><a
+        (click)="$event.stopPropagation(); expense.delete = false" class="mr-2">nein</a></span>
+      <span [class.pickup-tone]="expense.price._brutto < 0 && !gray"
+            [class.delivery-tone]="expense.price._brutto >= 0 && !gray" class="mr-2">
+          {{expense.price._brutto > 0 ? '+' : ''}}{{expense.price._brutto}}
+        </span>
+      {{expense.description}}
+    </div>
+  </div>
+</div>

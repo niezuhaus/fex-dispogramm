@@ -1,0 +1,33 @@
+@import "../../../const";
+
+li {
+  list-style-type: disc;
+}
+
+ul {
+  margin: 0;
+}
+
+.headDarker {
+  background: #ddd;
+}
+
+.darker {
+  background: rgba(128, 97, 175, 0.07);
+}
+
+.mat-row:nth-child(even) {
+  background: #eeed;
+}
+
+.weekplancell:hover {
+  background: rgba(128, 97, 175, 0.17);
+}
+
+.description:hover {
+  background: rgba(128, 97, 175, 0.1);
+}
+
+.gray {
+  color: $gray !important;
+}

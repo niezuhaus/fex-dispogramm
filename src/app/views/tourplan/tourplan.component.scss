@@ -1,0 +1,81 @@
+@import "src/const.scss";
+
+td {
+  text-align: center;
+}
+
+.price {
+  white-space: nowrap;
+}
+
+#jobs {
+  width: 100vw;
+}
+
+#table {
+  overflow-y: scroll;
+}
+
+#tourplan {
+  height: calc(100% - 100px)
+}
+
+#footer {
+  min-width: 250px;
+  padding: 10px 35px;
+  position: fixed;
+  display: flex;
+  bottom: 0;
+  right: 0;
+}
+
+h5:not(.normal){
+  margin-top: 10px;
+}
+
+.row_half-transparent {
+  opacity: .5;
+}
+
+.row_undispatched {
+  background-color: $undispatched;
+}
+
+.row_note {
+  background: #c4c4c4;
+}
+
+.row_partOfMorningTour {
+  background-color: #f2eaff;
+}
+
+.time-ago {
+  border-radius: 11px;
+  padding: 3px 6px;
+  color: white;
+  width: fit-content;
+  font-weight: bold;
+  align-self: center;
+  background-color: $accent;
+}
+
+.time-ago_alarm {
+  background-color: $warn !important;
+}
+
+.note {
+  color: $fex-dark;
+  border-left: 1.2pt dashed #c7c7c7 !important;
+  padding-left: 20px;
+  font-weight: bold;
+}
+
+.gray {
+  color: $gray !important;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+}

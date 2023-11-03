@@ -1,0 +1,208 @@
+body {
+  //display: flex;
+  //align-items: center;
+  //justify-content: center;
+}
+
+.bike {
+  position: relative;
+  width: 250px;
+  height: 200px;
+  margin-top: 5px;
+}
+
+.bike.running {
+  animation: .5s linear infinite alternate bikemovement;
+}
+
+@keyframes bikemovement {
+  from{
+    margin-top: 5px;
+  }
+  to{
+    margin-top: 0;
+  }
+}
+
+.wheel {
+  border: solid 2px #d1d2d5;
+  border-radius: 50%;
+  height: 100px;
+  width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.running {
+  animation: 1s linear infinite wheelmovement;
+}
+
+.wheel__left {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.wheel__right {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.spoke {
+  width: 45px;
+  height: 2px;
+  position: absolute;
+  background: #d1d2d5;
+}
+
+.spoke__left--1 {
+  transform: rotate(60deg);
+  top: 26px;
+  left: 12px;
+}
+
+.spoke__left--2 {
+  transform: rotate(60deg);
+  top: 71px;
+  left: 38px;
+}
+
+.spoke__right--1 {
+  transform: rotate(60deg);
+  top: 26px;
+  left: 12px;
+}
+
+.spoke__right--2 {
+  transform: rotate(60deg);
+  top: 70px;
+  left: 39px;
+}
+
+.hub {
+  background: #d1d2d5;
+  border-radius: 50%;
+  height: 10px;
+  width: 10px;
+}
+
+@keyframes wheelmovement {
+  from{
+    transform: rotate(0deg);
+  }
+  to{
+    transform: rotate(360deg);
+  }
+}
+
+.fork {
+  position: absolute;
+  top: 50px;
+  right: 68px;
+  background: #d1d2d5;
+  height: 100px;
+  width: 3px;
+  transform: rotateZ(340deg);
+}
+
+.chainring {
+  position: absolute;
+  bottom: 20px;
+  left: 85px;
+  height: 40px;
+  width: 40px;
+  border: solid 3px #d1d2d5;
+  border-radius: 50%;
+}
+
+.down-tube {
+  position: absolute;
+  bottom: 30px;
+  right: 108px;
+  background: #d1d2d5;
+  height: 103px;
+  width: 4px;
+  transform: rotateZ(40deg);
+}
+
+.top-tube {
+  position: absolute;
+  top: 78px;
+  left: 77px;
+  background: #d1d2d5;
+  height: 4px;
+  width: 95px;
+}
+
+.seat-tube {
+  position: absolute;
+  top: 52px;
+  left: 87px;
+  background: #d1d2d5;
+  width: 4px;
+  height: 110px;
+  transform: rotateZ(160deg);
+}
+
+.seat-stay {
+  position: absolute;
+  top: 75px;
+  left: 64px;
+  background: #d1d2d5;
+  width: 3px;
+  height: 75px;
+  transform: rotateZ(200deg);
+}
+
+.chain-stay {
+  position: absolute;
+  bottom: 18px;
+  left: 78px;
+  background: #d1d2d5;
+  width: 3px;
+  height: 60px;
+  transform: rotateZ(100deg);
+}
+
+.chain__upper {
+  position: absolute;
+  bottom: 26px;
+  left: 78px;
+  background: #d1d2d5;
+  width: 2px;
+  height: 60px;
+  transform: rotateZ(84deg);
+}
+
+.chain__bottom {
+  position: absolute;
+  bottom: 5px;
+  left: 75px;
+  background: #d1d2d5;
+  width: 2px;
+  height: 60px;
+  transform: rotateZ(117deg);
+}
+
+.saddle {
+  position: absolute;
+  top: 50px;
+  left: 55px;
+  background: #d1d2d5;
+  width: 40px;
+  height: 10px;
+  border-radius: 60% 100% 800% 100%;
+}
+
+.handlebars {
+  position: absolute;
+  top: 52px;
+  right: 58px;
+  border: solid 3px #d1d2d5;
+  border-left: transparent;
+  width: 30px;
+  height: 25px;
+  border-radius: 60% 1000% 500% 300%;
+}

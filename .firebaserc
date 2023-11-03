@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "axial-yen-361001"
+  },
+  "targets": {
+    "axial-yen-361001": {
+      "hosting": {
+        "dispogramm": [
+          "axial-yen-361001"
+        ]
+      }
+    }
+  }
+}

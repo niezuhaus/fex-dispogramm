@@ -1,0 +1,614 @@
+@use '@angular/material' as mat;
+@import "bootstrap-icons/font/bootstrap-icons.css";
+@import "src/const.scss";
+@import "src/lib/core/theming/_palette.scss";
+@import '@angular/material/theming';
+@import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+$fex-primary: mat.define-palette($fex-primary-palette, 500);
+$fex-accent: mat.define-palette($fex-accent-palette, 500, 700, 900);
+$fex-warn: mat.define-palette($fex-warn-palette, 500);
+
+$my-theme: mat.define-light-theme((
+  color: (
+    primary: $fex-primary,
+    accent: $fex-accent,
+    warn: $fex-warn,
+  )
+));
+
+@include mat.core-theme($my-theme);
+
+@include mat.all-component-themes($my-theme);
+
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(assets/font/MaterialIcons-Regular.ttf) format('woff2');
+}
+
+img {
+  max-width: unset !important;
+}
+
+.material-icons {
+  font-family: 'Material Icons', sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px; /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.fex-dark {
+  background-color: $fex-dark;
+}
+
+.color-fex-dark {
+  color: $fex-dark;
+}
+
+.fex-light {
+  color: $fex-light !important;
+}
+
+.background-fex-light {
+  background-color: $fex-light !important;
+}
+
+.fex-sparkling {
+  color: $fex-sparkling !important;
+}
+
+.fex-accent {
+  color: $accent !important;
+}
+
+.fex-warn {
+  color: $warn;
+}
+
+h1 {
+  font-size: 2rem;
+  color: $fex-light;
+}
+
+h2 {
+  font-size: 14px;
+}
+
+a:not(a.fex-warn, a.fex-accent, a.color-fex-dark) {
+  color: $fex-dark !important;
+}
+
+a {
+  text-decoration: none !important;
+  cursor: pointer;
+}
+
+a:hover {
+  color: $fex-light !important;
+  text-decoration: none;
+}
+
+p.noMargin {
+  margin: unset;
+}
+
+.hightlight {
+  height: fit-content;
+  border: 2px solid $fex-dark;
+  border-radius: 5px;
+  color: $fex-dark;
+  padding: 5px;
+  white-space: nowrap;
+}
+
+.expense {
+  height: fit-content;
+  border: 2px dashed $fex-dark;
+  border-radius: 13px;
+  white-space: nowrap;
+}
+
+.phoneNumber {
+  padding: 6px;
+  background: $fex-light;
+  border-radius: 10px;
+  color: white;
+  line-height: 8px;
+}
+
+.hidden {
+  visibility: hidden;
+  position: absolute !important;
+}
+
+.transparent {
+  opacity: 0;
+}
+
+.line-through-3px {
+  text-decoration: line-through;
+  text-decoration-thickness: 3px;
+}
+
+.line-through-2px {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.optionDetail {
+  font-family: monospace;
+  color: darkgray;
+  margin-left: 10px;
+}
+
+#tableholder {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+}
+
+td:not(.mat-calendar-body-cell-container, .mat-calendar-body-label) {
+  border: 1.2pt dashed #c7c7c7 !important;
+}
+
+td:not(.mat-calendar-body-cell-container, .mat-calendar-body-label, .weekplancell) {
+  padding: 3px 10px !important;
+}
+
+th.mat-header-cell:last-of-type {
+  padding: 0 !important;
+}
+
+.mat-dialog-container {
+  overflow-x: clip !important;
+}
+
+.firmat-dialog-content {
+  margin: 0 !important;
+}
+
+.mat-sort-header-container {
+  justify-content: center;
+}
+
+.mat-paginator-icon {
+  color: rgba(0, 0, 0, .54);
+}
+
+.relative-top8px {
+  position: relative;
+  top: 8px;
+}
+
+.relative-top4px {
+  position: relative;
+  top: 4px;
+}
+
+.relative-bot4px {
+  position: relative;
+  bottom: 4px;
+}
+
+.relative-bot8px {
+  position: relative;
+  bottom: 8px;
+}
+
+.mat-input-element:disabled {
+  color: $gray !important;
+}
+
+.mat-form-field-wrapper {
+  width: 100% !important;
+}
+
+.time .mat-form-field-flex {
+  max-width: 5em;
+}
+
+.mat-input-element {
+  color: black !important;
+}
+
+.mat-icon-button {
+  justify-content: space-around;
+  color: white !important;
+}
+
+.mat-button, .border-solid {
+  border: 2px solid black;
+}
+
+.mat-button > span > i {
+  margin: 10px 0;
+}
+
+div.mat-form-field-infix {
+  padding-right: 20px;
+  width: unset;
+}
+
+.mat-tab-body-wrapper {
+    margin-top: 13px;
+}
+
+.mat-tab-body-content {
+  overflow-x: hidden !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform: none;
+}
+
+.mat-button-toggle-label-content {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.mat-calendar-previous-button::after, .mat-calendar-next-button::after {
+  color: black;
+}
+
+.extra {
+  width: 200px !important;
+}
+
+i.bi:not(.small, .medium, .big) {
+  font-size: 20px;
+}
+
+i.bi.big {
+  font-size: 200px;
+}
+
+i.bi.medium {
+  font-size: 20px;
+}
+
+i.bi.small {
+  font-size: 14px;
+}
+
+.bi-arrow-right-short, .bi-arrow-left-short {
+  display: flex;
+}
+
+.bi {
+  position: relative;
+}
+
+.bi-x:not(.bi-x-transparent) {
+  background-color: white;
+}
+
+.bi-x:hover {
+  color: $fex-dark;
+}
+
+.bi-box-arrow-up-right {
+  margin-left: 5px;
+}
+
+.bi-checked {
+  color: $fex-light;
+}
+
+.bi-unchecked {
+  color: black;
+}
+
+.bi-context {
+  font-size: 13px;
+  margin-right: 5px;
+}
+
+.mat-menu-panel {
+  //max-width: unset !important;
+}
+
+.mat-menu-item {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.client-tone {
+  color: $client-tone;
+}
+
+.delivery-tone {
+  color: $delivery-tone;
+}
+
+.pickup-tone {
+  color: $pickup-tone;
+}
+
+.bi-circle-fill {
+  margin-right: 5px;
+}
+
+.fex-button {
+  color: white !important;
+  background-color: $fex-dark;
+  width: fit-content !important;
+  height: fit-content !important;
+  transition: 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.fex-green-button {
+  color: white !important;
+  background-color: #1fa000;
+  width: fit-content !important;
+  height: fit-content !important;
+  transition: 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.fex-accent-button {
+  color: white !important;
+  background-color: $accent;
+  width: fit-content !important;
+  height: fit-content !important;
+  transition: 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.lex-button {
+  margin-right: 20px !important;
+  color: white !important;
+  background-color: $lex;
+  width: fit-content !important;
+  height: fit-content !important;
+  transition: 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.fex-button-outline {
+  color: $fex-dark !important;
+  border: 2px solid $fex-dark !important;
+  background-color: white;
+  width: fit-content !important;
+  height: fit-content !important;
+  transition: 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.fex-button-gray {
+  color: white !important;
+  background-color: rgb(69, 69, 69);
+  width: fit-content !important;
+  height: fit-content !important;
+  transition: 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.fex-button-try {
+  background-color: $fex-dark !important;
+}
+
+.fex-button-abort {
+  background-color: #c8c8c8 !important;
+  color: black !important;
+}
+
+.fex-button-warn {
+  background-color: $warn !important;
+  color: white !important;
+}
+
+.fex-button-warn:hover {
+  background-color: #d3222c !important;
+}
+
+.fex-button:not(.dis, .fex-button-warn):hover {
+  color: white !important;
+  background-color: $fex-light !important;
+}
+
+.fex-button:disabled:hover {
+  background-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+.mat-option-text {
+  display: flex !important;
+  flex-direction: column !important;
+  line-height: normal;
+}
+
+.detailedOption .mat-option-text {
+  flex-direction: row !important;
+  justify-content: space-between;
+}
+
+.date .mat-form-field-flex {
+  max-width: 10em;
+}
+
+.mat-select-panel {
+  max-width: unset !important;
+}
+
+.mat-select-value {
+  width: 100%;
+}
+
+.mat-option.mat-active {
+  background: $option-active;
+}
+
+.mat-option:hover:not(.mat-option-disabled) {
+  background: $option-hover;
+}
+
+.info-option {
+  height: fit-content !important;
+}
+
+.info-option > .mat-option-text {
+  padding: 10px 0;
+  width: 100%;
+}
+
+.mat-form-field-flex, .mat-form-field-appearance-standard {
+  padding-top: 0 !important;
+}
+
+#messenger-panel {
+  max-height: 50vh;
+}
+
+.ripple {
+  background-color: $fex-dark;
+  color: white;
+  cursor: pointer;
+}
+
+.mapboxgl-popup-content {
+  line-height: 1.4;
+  padding: 10px !important;
+}
+
+.marker {
+  background-size: cover;
+  width: 25px;
+  height: 41px;
+  top: -20px !important;
+  cursor: pointer;
+}
+
+.notes {
+  position: unset;
+  flex-direction: column;
+  font-size: 14px;
+  bottom: 0;
+  min-height: 150px;
+  animation: ease-in;
+  animation-duration: .2s;
+}
+
+.shadow {
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+  0 2px 2px 0 rgba(0, 0, 0, 0.14),
+  0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.w-20 {
+  width: 20% !important;
+}
+
+.w-40 {
+  width: 40% !important;
+}
+
+.w-60 {
+  width: 60% !important;
+}
+
+.w-80 {
+  width: 80% !important;
+}
+
+.m-blue {
+  background-image: url("assets/marker/marker-icon-2x-blue.png");
+}
+
+.m-blue-up {
+  background-image: url("assets/marker/marker-icon-2x-blue-up.png");
+}
+
+.m-blue-down {
+  background-image: url("assets/marker/marker-icon-2x-blue-down.png");
+}
+
+.m-blue-add {
+  background-image: url("assets/marker/marker-icon-2x-blue-add.png");
+}
+
+.m-red {
+  background-image: url("assets/marker/marker-icon-2x-red.png");
+}
+
+.m-red-up {
+  background-image: url("assets/marker/marker-icon-2x-red-up.png");
+}
+
+.m-red-add {
+  background-image: url("assets/marker/marker-icon-2x-red-add.png");
+}
+
+.m-green {
+  background-image: url("assets/marker/marker-icon-2x-green.png");
+}
+
+.m-green-down {
+  background-image: url("assets/marker/marker-icon-2x-green-down.png");
+}
+
+.m-green-add {
+  background-image: url("assets/marker/marker-icon-2x-green-add.png");
+}
+
+.m-backtour {
+  background-image: url("assets/marker/marker-icon-2x-backtour.png");
+}
+
+.m-backtour-add {
+  background-image: url("assets/marker/marker-icon-2x-add-backtour.png");
+}
+
+.m-pink {
+  background-image: url("assets/marker/marker-icon-2x-pink.png");
+}
+
+.drag {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+}
+
+.loadingScreen {
+  display: grid;
+  justify-items: center;
+}
+
+.fullPageSpinner {
+  position: absolute !important;
+  left: calc(50vw - 40px);
+  top: calc(50vh - 50px);
+}
+
+/* Importing Bootstrap SCSS file. */
+@import 'bootstrap/scss/bootstrap';

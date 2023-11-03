@@ -1,0 +1,100 @@
+<div class="my-4">
+  <button mat-button class="mx-4" (click)="week = week[0].previousWorkingWeek(); loadWeek()"><i
+    class="bi bi-chevron-left"></i></button>
+  {{title}}
+  <button mat-button class="mx-4" (click)="week = week[0].nextWorkingWeek(); loadWeek()"><i
+    class="bi bi-chevron-right"></i></button>
+</div>
+
+<div *ngIf="!loaded" style="height: 90vh !important;"
+     class="flex w-100 h-100 align-items-center justify-content-center">
+  <bike style="margin: auto"></bike>
+</div>
+
+<table mat-table [dataSource]="dataSource" class="w-100" *ngIf="loaded">
+  <ng-container matColumnDef="time">
+    <th mat-header-cell *matHeaderCellDef style="width: 80px; text-align: center"> zeit</th>
+    <td mat-cell *matCellDef="let element" class="weekplancell">
+      <p style="text-align: center; margin: 0">{{element}}</p>
+    </td>
+  </ng-container>
+  <ng-container *ngFor="let day of days; let dayIndex = index" [matColumnDef]="day">
+    <th mat-header-cell *matHeaderCellDef style="text-align: center"
+        [class.darker]="week[dayIndex].isToday()">
+      <a [routerLink]="[routes.tourplan, {date: week[dayIndex].yyyymmdd()}]" style="font-size: 1.5em">
+        {{week[dayIndex].dateStampLong()}}
+      </a>
+    </th>
+    <td #container mat-cell
+        (contextmenu)="onRightClick($event, dateByColumn(dayIndex, i))"
+        *matCellDef="let element; let i = index" class="weekplancell"
+        [class.darker]="today.toDateString() === week[dayIndex].toDateString()">
+      <div *ngIf="!newNote || newNote.column !== dayIndex || newNote.row !== i else noteInputContainer">
+        <div #redBar
+          *ngIf="week[dayIndex].isToday() && todayTimeIndex === i"
+          style="position:relative;
+        border-top: 2px solid #f005"
+          class="w-100"
+          [style.top.px]="pxTop(dayIndex, i, container.offsetHeight, !(items[dayIndex][i].length))"
+        ></div>
+        <div
+          *ngFor="let item of items[dayIndex][i]"
+          class="description"
+          [style.box-shadow]="item._job?.finished ? ('') : ('inset 10px 0px 0px' + item._colour)">
+          <ul *ngIf="!item.isNote">
+            <li [class.gray]="item._messenger">
+              <description
+                [item]="item"
+                [hideHighlights]="true"
+                [weekplan]="true"
+                [purpleRegularJobs]="true"
+                [showPrices]="item.isJob && !item.isConverted"
+                (contextmenu)="onRightClick($event, dateByColumn(dayIndex, i), item)"
+                class="flex">
+              </description>
+            </li>
+          </ul>
+          <div *ngIf="item.isNote" #note (contextmenu)="onRightClick($event, dateByColumn(dayIndex, i), item)">
+            <span>
+            <i class="bi bi-sticky mx-3 small"></i>notiz von {{item.note.creator.nickname}}: {{item._name}}
+            </span>
+            <input type="text" [(ngModel)]="item.note" *ngIf="item.edit">
+          </div>
+        </div>
+      </div>
+      <ng-template #noteInputContainer>
+        <mat-form-field class="w-100 px-4">
+          <mat-label>notiz</mat-label>
+          <input (keyup.enter)="saveNote(dateByColumn(dayIndex, i), noteInput.value)" #noteInput matInput type="text">
+        </mat-form-field>
+      </ng-template>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="time2">
+    <th mat-header-cell *matHeaderCellDef style="width: 80px; text-align: center"> zeit</th>
+    <td mat-cell *matCellDef="let element" class="weekplancell">
+      <p style="text-align: center; margin: 0">{{element}}</p>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.darker]="" style="height: 20px"></tr>
+</table>
+
+<div class="container">
+  <div style="visibility: hidden; position: fixed"
+       [style.left.px]="menuTopLeftPosition.x"
+       [style.top.px]="menuTopLeftPosition.y"
+       [matMenuTriggerFor]="rightMenu"></div>
+
+  <mat-menu #rightMenu="matMenu">
+    <ng-template matMenuContent let-date="date" let-item="item">
+      <right-click-menu
+        [date]="date"
+        [item]="item"
+        (newNote)="newNote = columnByDate($event)"
+        [weekplan]="true">
+      </right-click-menu>
+    </ng-template>
+  </mat-menu>
+</div>

@@ -1,0 +1,30 @@
+#information {
+  margin: 20px 0 0 20px;
+}
+
+#map {
+  height: 40vh;
+  width: 100vw;
+}
+
+#mapcontainer {
+  position: fixed;
+  bottom: 0;
+}
+
+table {
+  width: 100%;
+}
+
+#bike {
+  align-items: center;
+  justify-content: space-around;
+  display: flex;
+  height: 80%;
+}
+
+#delete {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+}
